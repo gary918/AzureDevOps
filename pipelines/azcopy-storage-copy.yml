@@ -1,0 +1,38 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+steps:
+# Starter pipeline
+
+- task: AzureCLI@2
+  displayName: Install azcopy v10
+  inputs:
+    azureSubscription: 'xxxx'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      #Download AzCopy
+      wget https://aka.ms/downloadazcopy-v10-linux
+      #Expand Archive
+      tar -xvf downloadazcopy-v10-linux
+      #(Optional) Remove existing AzCopy version
+      sudo rm /usr/bin/azcopy
+      #Move AzCopy to the destination you want to store it
+      sudo cp ./azcopy_linux_amd64_*/azcopy /usr/bin/
+
+- task: AzureCLI@2
+  displayName: Copy folders from source storage account to dest storage account
+  inputs:
+    azureSubscription: 'xxxx'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # copy files(blobs) from release/build001/* to release/buildid/*
+      azcopy cp "https://$(source-storage-account-name).blob.core.windows.net/$(container-name)/releases/build001/*$(source-sas-token)" "https://$(source-storage-account-name).blob.core.windows.net/$(container-name)/releases/$(Build.BuildID)$(source-sas-token)" --recursive=true
+
