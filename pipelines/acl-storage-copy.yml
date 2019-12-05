@@ -1,0 +1,33 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+steps:
+# Starter pipeline
+
+
+- task: AzureCLI@2
+  displayName: Copy folders from source storage account to dest storage account
+  inputs:
+    azureSubscription: 'xxxxxx'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az storage blob copy start-batch \
+        --account-name $(dest-storage-account-name) \
+        --account-key $(dest-storage-access-key) \
+        --destination-container $(dest-container-name) \
+        --source-account-name $(source-storage-account-name) \
+        --source-account-key $(source-storage-access-key) \
+        --source-container $(source-container-name) \
+        --pattern $(files-to-copy)
+      az storage blob show \
+        --account-name $(storage-account-name) \
+        --account-key $(sacctprehkpeakdiadb-access-key) \
+        --container-name $(container-name) \
+        --name 'releases/build001/xxx.pkl'
