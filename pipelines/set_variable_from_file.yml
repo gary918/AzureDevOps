@@ -1,0 +1,40 @@
+trigger:
+  - none
+
+pr: none
+
+variables:
+- group: xxx
+- name: parquet_file_path
+  value: "shared/gary"
+
+
+stages:
+- stage: 'SomeTest'
+  displayName: 'Some Test'
+  jobs:
+  - job: 'SomeTest'
+    displayName: 'Some Test'
+    pool:
+      vmImage: 'windows-latest' # 'ubuntu-latest'
+    strategy:
+      matrix:
+        pytest-adf:
+          python.version: '3.7'
+    steps:
+    - script: |
+        echo $(parquet_file_path) > parquet_file_path.txt
+        set /p PARQUET_FILE_PATH=<parquet_file_path.txt
+        echo "%PARQUET_FILE_PATH%"
+      displayName: 'Save parquet_file_path into a text file.'
+    
+    - script: |
+        pip install nutter
+      displayName: 'Install Nutter'
+
+    # - script: |
+    #     echo $(parquet_file_path) > parquet_file_path.txt
+    #     PARQUET_FILE_PATH="$(cat parquet_file_path.txt)"
+    #     echo "##vso[task.setvariable variable=PARQUET_FILE_PATH;isOutput=true]$PARQUET_FILE_PATH"
+    #   displayName: 'Save parquet_file_path into a text file.'
+    
